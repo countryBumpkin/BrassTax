@@ -21,7 +21,7 @@
     // close connection
     mysqli_close($conn);
 
-    print_r($test);
+    //print_r($test);
 ?>
 
 <!DOCTYPE html>
