@@ -1,18 +1,18 @@
 <?php
 
-    $ID = $title = $amount = '';
-    $errors = array('ID' => '', 'title'=>'', 'amount'=>'');
+    $TID = $title = $amount = '';
+    $errors = array('TID' => '', 'title'=>'', 'amount'=>'');
     
     if(isset($_POST['submit'])){
-        if(empty($_POST['ID'])){
-            $errors['ID'] = 'A \'Personal ID Number\' is required <br />';
+        if(empty($_POST['TID'])){
+            $errors['TID'] = 'A \'Personal TID Number\' is required <br />';
         }
         else{
-            $ID = $_POST['ID'];
-            if(!preg_match('/^[0-9]{5}$/', $ID)){ //{#} is the length it will match
-                $errors['ID'] = 'ID must only be numbers with a length of 20 <br />';
+            $TID = $_POST['TID'];
+            if(!preg_match('/^[0-9]{5}$/', $TID)){ //{#} is the length it will match
+                $errors['TID'] = 'TID must only be numbers with a length of 20 <br />';
             }
-            //echo htmlspecialchars($_POST['ID']);
+            //echo htmlspecialchars($_POST['TID']);
         }
 
         if(empty($_POST['title'])){
@@ -40,7 +40,7 @@
         }
         else{
             //redirect user to main page
-            header('Location: index.php');
+            header('Location: user.php');
         }
 
     }  // end of post check
@@ -54,9 +54,9 @@
     <section class="container grey-text">
         <h4 class="center">Add Expense</h4>
         <form class="white" action="form_expense.php" method="POST">
-            <label>Your Personal ID </label>
-            <input type="text" name="ID" value="<?php echo htmlspecialchars($ID)?>">
-            <div class="red-text"><?php echo $errors['ID']; ?></div>
+            <label>Your Personal TID </label>
+            <input type="text" name="TID" value="<?php echo htmlspecialchars($TID)?>">
+            <div class="red-text"><?php echo $errors['TID']; ?></div>
             <label>Expese Title </label>
             <input type="text" name="title" value="<?php echo htmlspecialchars($title)?>">
             <div class="red-text"><?php echo $errors['title']; ?></div>

@@ -21,9 +21,12 @@
             padding: 20px;
         }
         .navbar{
-            height: 200px; /* Just an example height*/
+            height: 800px; /* Just an example height*/
         }
-
+        form label{
+            font-weight:bold;
+            color: #1A1113  !important;
+        }
     </style>
 
 </head>
@@ -42,8 +45,7 @@
       <ul class="tabs tabs-transparent">
         <li class="tab col s3"><a class="active" href="user.php">User Forms</a></li>
         <li class="tab col s3"><a class="active" href="company.php">Company Forms</a></li>
-        <li class="tab col s3"><a class="active" href="blank.php">Other</a></li>
-        <li class="tab col s3"><a class="active" href="blank.php">Other 2</a></li>
+        <li class="tab col s3"><a class="active" href="other.php">Other</a></li>
       </ul>
     </div>
   </nav>
