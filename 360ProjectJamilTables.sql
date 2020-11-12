@@ -1,3 +1,5 @@
+#Atomic Tables
+
 CREATE TABLE Taxpayer
 (
 	TID NUMERIC(20, 0) NOT NULL UNIQUE,
@@ -17,6 +19,27 @@ CREATE TABLE Taxpayer
     PRIMARY KEY (TID)
 );
 
+CREATE TABLE Employers
+(
+	SID NUMERIC(20, 0) NOT NULL UNIQUE,
+	Name VARCHAR(255),
+	Address VARCHAR(255) NOT NULL,
+	EmployerZIP VARCHAR(31),
+	Classification VARCHAR(255),
+	ContactPerson VARCHAR(255) NOT NULL,
+	
+	PRIMARY KEY (SID)
+);
+
+CREATE TABLE RentalProperties
+(
+	SID NUMERIC(20, 0) NOT NULL UNIQUE,
+	Address VARCHAR(255) NOT NULL,
+	ContactPerson VARCHAR(255) NOT NULL,
+	
+	PRIMARY KEY (SID)
+);
+
 CREATE TABLE Expenses
 (
 	TID NUMERIC(20, 0) NOT NULL,
@@ -26,11 +49,22 @@ CREATE TABLE Expenses
 	TaxCategory VARCHAR(255) NOT NULL,
 	Amount INT NOT NULL,
 	
-	PRIMARY KEY (TID, ExpDate, TaxYear, Description, TaxCategory),
+	PRIMARY KEY (TID, EPDate, TaxYear, Description, TaxCategory),
 	FOREIGN KEY (TID)
 	REFERENCES Taxpayer (TID)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE IncomeSources
+(
+	SID NUMERIC(20, 0) NOT NULL UNIQUE,
+	Address VARCHAR(255) NOT NULL,
+	ContactPerson VARCHAR(255) NOT NULL,
+	
+	PRIMARY KEY (SID)
+);
+
+#Foreign key-ers
 
 CREATE TABLE EmploymentExpenses
 (
@@ -62,7 +96,7 @@ CREATE TABLE LoanExpenses
 	LoanAmount INT,
 	RemainingBalance INT,
 	
-	PRIMARY KEY (TID, ExpDate, TaxYear, Description, TaxCategory),
+	PRIMARY KEY (TID, LPDate, TaxYear, Description, TaxCategory),
 	FOREIGN KEY (TID)
 	REFERENCES Taxpayer (TID)
 	ON DELETE CASCADE ON UPDATE CASCADE
@@ -119,36 +153,6 @@ CREATE TABLE RentalEarnings
 	FOREIGN KEY (RenterID)
 	REFERENCES Taxpayer(TID)
 	ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IncomeSources
-(
-	SID NUMERIC(20, 0) NOT NULL UNIQUE,
-	Address VARCHAR(255) NOT NULL,
-	ContactPerson VARCHAR(255) NOT NULL,
-	
-	PRIMARY KEY (SID)
-);
-
-CREATE TABLE Employers
-(
-	SID NUMERIC(20, 0) NOT NULL UNIQUE,
-	Name VARCHAR(255),
-	Address VARCHAR(255) NOT NULL,
-	EmployerZIP VARCHAR(31),
-	Classification VARCHAR(255),
-	ContactPerson VARCHAR(255) NOT NULL,
-	
-	PRIMARY KEY (SID)
-);
-
-CREATE TABLE RentalProperties
-(
-	SID NUMERIC(20, 0) NOT NULL UNIQUE,
-	Address VARCHAR(255) NOT NULL,
-	ContactPerson VARCHAR(255) NOT NULL,
-	
-	PRIMARY KEY (SID)
 );
 
 CREATE TABLE WorksFor
