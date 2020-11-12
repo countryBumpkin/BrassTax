@@ -1,7 +1,9 @@
 CREATE TABLE Taxpayer
 (
 	TID NUMERIC(20, 0) NOT NULL UNIQUE,
-    Name VARCHAR(255) NOT NULL,
+    FirstName VARCHAR(255),
+	MiddleInitial VARCHAR(1),
+	LastName VARCHAR(255),
     Age INT, #65+ year-old taxpayers get a $500 deduction
     Sex VARCHAR(255), #Female taxpayers get a $500 deduction
     DoB DATE,
@@ -10,29 +12,10 @@ CREATE TABLE Taxpayer
     ResState VARCHAR(2), #2 letter state code, "DC" counts as a state
 	NumDependents INT,
     #Should ResState include US territories like Puerto Rico (PR)?
-    #ResZIP VARCHAR(255), #non-numeric; ZIPs may include hyphens
+    ResZIP VARCHAR(31), #non-numeric; ZIPs may include hyphens
     
     PRIMARY KEY (TID)
 );
-
-/*
-CREATE TABLE Expenses #Relevant, deductible expense types are subtracted from Income to get Adjusted Taxable Income.
-#Individuals may report non-deductible expenses, but those are ignored (I think).
-#Individual transactions are NOT to be reported here. Only the yearly sums, per expense type.
-(
-	TID NUMERIC(20, 0) NOT NULL,
-    ExpenseType VARCHAR(255) NOT NULL, #"Student Loan", "Home Mortgage", "Rental Repair", and "Job Related" are the relevant expenses. Use "Other" for any other expenses.
-    TotalYearlyExpense INT NOT NULL,
-    NonInterestExpense INT NOT NULL,
-    InterestExpense INT NOT NULL, #For home mortgages, only interests are deductible. Student loans are entirely deductible. Other expenses shouldnt have interests.
-    #NonInterestExpense + InterestExpense should equal TotalYearlyExpense.
-    
-    PRIMARY KEY (TID, ExpenseType), #you must UPDATE, or DELETE a row to redo its Expenses.
-    FOREIGN KEY (TID)
-    REFERENCES Taxpayer (TID)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
-*/
 
 CREATE TABLE Expenses
 (
@@ -152,6 +135,7 @@ CREATE TABLE Employers
 	SID NUMERIC(20, 0) NOT NULL UNIQUE,
 	Name VARCHAR(255),
 	Address VARCHAR(255) NOT NULL,
+	EmployerZIP VARCHAR(31),
 	Classification VARCHAR(255),
 	ContactPerson VARCHAR(255) NOT NULL,
 	
@@ -216,8 +200,6 @@ CREATE TABLE Rents
 	REFERENCES RentalProperties(SID)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-
 
 
 
