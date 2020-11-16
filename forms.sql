@@ -1,6 +1,7 @@
 CREATE TABLE TaxReturn
 (
 	TID NUMERIC(20, 0) NOT NULL,
+	TRYear YEAR NOT NULL,
 	FilingStatus VARCHAR(255),
 	FirstName VARCHAR(255),
 	MiddleInitial VARCHAR(1),
@@ -47,15 +48,16 @@ CREATE TABLE TaxReturn
 	SumStdDeductAndQualifiedBusn INT,
 	TaxableIncome INT, #Subtract SumStdDeduct from AdjustedGrossIncome
 
-	PRIMARY KEY(),
-	FOREIGN KEY ()
-	REFERENCES
+	PRIMARY KEY(TID, TRYear),
+	FOREIGN KEY (TID)
+	REFERENCES Taxpayer (TID)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Dependent #For TaxReturn
 (
 	TID NUMERIC(20, 0) NOT NULL, #TID of person who can claim this dependent
+	DepYear YEAR NOT NULL,
 	DepFirst VARCHAR(255),
 	DepLast VARCHAR(255),
 	SSN NUMERIC(9, 0), #NO HYPHENS
@@ -63,9 +65,9 @@ CREATE TABLE Dependent #For TaxReturn
 	ChildTaxCredit VARCHAR(3), #yes or no 
 	CreditForOtherDependents VARCHAR(3),
 	
-	PRIMARY KEY (),
-	FOREIGN KEY ()
-	REFERENCES 
+	PRIMARY KEY (TID, DepYear),
+	FOREIGN KEY (TID)
+	REFERENCES Taxpayer (TID)
 	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -73,6 +75,7 @@ CREATE TABLE W2
 (
 	TID NUMERIC(20, 0) NOT NULL,
 	SID NUMERIC(20, 0) NOT NULL,
+	W2Year YEAR NOT NULL,
 	EName VARCHAR(255),
 	EAddress VARCHAR(255),
 	EZIP VARCHAR(31),
@@ -82,7 +85,7 @@ CREATE TABLE W2
 	TAddress VARCHAR(255),
 	TCity VARCHAR(255),
 	TState VARCHAR(2),
-	TZIP VARCHAR(31)
+	TZIP VARCHAR(31),
 	TSSN NUMERIC(9,0),
 	
 	#gotta grab and store address info here for posterity (if a Taxpayer updates their address, it shouldnt change here)
@@ -101,8 +104,11 @@ CREATE TABLE W2
 	LocalIncomeTax INT,
 	LocalityName VARCHAR(255),
 	
-	PRIMARY KEY (),
-	FOREIGN KEY ()
-	REFERENCES ()
+	PRIMARY KEY (TID, SID, W2Year),
+	FOREIGN KEY (TID)
+	REFERENCES Taxpayer (TID)
 	ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (SID)
+	REFERENCES Employers (SID)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
