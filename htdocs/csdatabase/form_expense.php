@@ -54,7 +54,7 @@
     <section class="container grey-text">
         <h4 class="center">Add Expense</h4>
         <form class="white" action="form_expense.php" method="POST">
-            <label>Your Personal TID </label>
+            <label>Personal TID</label>
             <input type="text" name="TID" value="<?php echo htmlspecialchars($TID)?>">
             <div class="red-text"><?php echo $errors['TID']; ?></div>
             <label>Expese Title </label>

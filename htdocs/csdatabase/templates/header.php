@@ -34,11 +34,14 @@
     <nav class="nav-extended">
     <div class="nav-wrapper brand">
       <a href="/" class="brand-logo"><b>Database Class</b></a>
-      <ul id="nav-mobile" class="right hide-on-small-and-down">
+        <ul id="nav-mobile" class="right hide-on-small-and-down">
+            <li><a href="createB2.php" class="btn buttonColor z-depth-0">Create B-2</a></li>
+        </ul>
+        <ul id="nav-mobile" class="right hide-on-small-and-down">
             <li><a href="createW2.php" class="btn buttonColor z-depth-0">Create W-2</a></li>
         </ul>
         <ul id="nav-mobile" class="right hide-on-small-and-down">
-            <li><a href="createB2.php" class="btn buttonColor z-depth-0">Create B-2</a></li>
+            <li><a href="createTaxReturn.php" class="btn buttonColor z-depth-0">Create Tax Return</a></li>
         </ul>
     </div>
     <div class="nav-content headerbackground2">
