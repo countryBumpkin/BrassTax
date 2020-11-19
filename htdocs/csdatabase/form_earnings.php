@@ -1,12 +1,79 @@
 <?php
 
-    $TID = $date = $taxYear = $amount = '';
-    $errors = array('TID' => '', 'date'=>'', 'taxYear'=>'', 'amount'=>'');
+    include('db_connect.php');
+
+    $TID = $date = $year = $amount = '';
+    $errors = array('TID' => '', 'date'=>'', 'year'=>'', 'amount'=>'');
     
     if(isset($_POST['submit'])){
+        if(empty($_POST['TID'])){
+            $errors['TID'] = 'A \'Personal TID Number\' is required <br />';
+        }
+        else{
+            $TID = $_POST['TID'];
+            if(!preg_match('/^[0-9]{20}$/', $TID)){ //{#} is the length it will match
+                $errors['TID'] = 'TID must only be numbers with a length of 20 <br />';
+            }
+        }
 
+        if(empty($_POST['date'])){
+            $errors['date'] = 'A \'Date\' is required <br />';
+        }
+        else{
+            $date = $_POST['date'];
+            if(!preg_match('/^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})$/', $date)){
+                $errors['date'] = 'Date must be in format YYYY-MM-DD <br />';
+            }
+        }
+
+        if(empty($_POST['year'])){
+            $errors['year'] = 'A \'Year\' is required <br />';
+        }
+        else{
+            $year = $_POST['year'];
+            if(!preg_match('/^([0-9]+(\.[0-9]*){0,1})*$/', $year)){
+                $errors['year'] = 'Year must contain only numbers <br />';
+            }
+        }
+
+        if(empty($_POST['amount'])){
+            $errors['amount'] = 'At least one \'Amount\' is required <br />';
+        }
+        else{
+            $amount = $_POST['amount'];
+            if(!preg_match('/^([0-9]+(\.[0-9]*){0,1})*$/', $amount)){
+                $errors['amount'] = 'Amount must contain only numbers <br />';
+            }
+        }
+
+        if(array_filter($errors)){
+            //echo 'errors';
+        }
+        else{
+            $TID = mysqli_real_escape_string($conn, $_POST['TID']);
+            $date = mysqli_real_escape_string($conn, $_POST['date']);
+            $year = mysqli_real_escape_string($conn, $_POST['year']);
+            $amount = mysqli_real_escape_string($conn, $_POST['amount']);
+
+            // create sql
+            $sql = "INSERT INTO earnings(TID, EarnDate, TaxYear, Amount)
+                    VALUES('$TID', '$date', '$year', '$amount' )";
+
+            // save to database and check if it was sucessfull
+            if(mysqli_query($conn, $sql)){
+                // success
+
+                // redirect user to user page
+                header('Location: user.php');
+            }
+            else{
+                // failed
+                echo 'query error: ' . mysqli_error($conn);
+            }
+        }
     }  // end of post check
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -15,16 +82,16 @@
 
     <section class="container grey-text">
         <h4 class="center">Earnings</h4>
-        <form class="white" action="form_expense.php" method="POST">
+        <form class="white" action="form_earnings.php" method="POST">
             <label>Your Personal TID </label>
             <input type="text" name="TID" value="<?php echo htmlspecialchars($TID)?>">
             <div class="red-text"><?php echo $errors['TID']; ?></div>
-            <label>Date </label>
+            <label>Earn Date</label>
             <input type="text" name="date" value="<?php echo htmlspecialchars($date)?>">
             <div class="red-text"><?php echo $errors['date']; ?></div>
             <label>Tax Year</label>
-            <input type="text" name="taxYear" value="<?php echo htmlspecialchars($taxYear)?>">
-            <div class="red-text"><?php echo $errors['taxYear']; ?></div>
+            <input type="text" name="year" value="<?php echo htmlspecialchars($year)?>">
+            <div class="red-text"><?php echo $errors['year']; ?></div>
             <label>Amount</label>
             <input type="text" name="amount" value="<?php echo htmlspecialchars($amount)?>">
             <div class="red-text"><?php echo $errors['amount']; ?></div>

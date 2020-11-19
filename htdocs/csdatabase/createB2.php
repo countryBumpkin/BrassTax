@@ -10,7 +10,7 @@
 
     <section class="container grey-text">
         <h4 class="center">B-2 Form</h4>
-        <form class="white" action="form_employers.php" method="POST">
+        <form class="white" action="createB2.php" method="POST">
             <label>Personal TID</label>
             <input type="text" name="TID" value="<?php echo htmlspecialchars($TID)?>">
             

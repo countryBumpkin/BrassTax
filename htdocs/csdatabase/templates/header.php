@@ -48,7 +48,7 @@
       <ul class="tabs tabs-transparent">
         <li class="tab col s3"><a class="active" href="user.php">User Forms</a></li>
         <li class="tab col s3"><a class="active" href="company.php">Company Forms</a></li>
-        <li class="tab col s3"><a class="active" href="other.php">Other</a></li>
+        <li class="tab col s3"><a class="active" href="other.php">Management</a></li>
       </ul>
     </div>
   </nav>
