@@ -42,6 +42,9 @@
             <ul id="nav-mobile" class="left buttonSize hide-on-small-and-down">
                 <li><a href="form_rents.php" class="btn buttonColor z-depth-0">Rents</a></li>
             </ul><br>
+            <ul id="nav-mobile" class="left buttonSize hide-on-small-and-down">
+                <li><a href="form_dependent.php" class="btn buttonColor z-depth-0">Dependents</a></li>
+            </ul><br>
         </div>
     </nav>    
 
