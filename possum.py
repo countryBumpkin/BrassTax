@@ -73,8 +73,10 @@ class Possum:
 
 		# Check for conflicts
 		inspector = inspect(engine)
+		conflict = False
 		for name in inspector.get_table_names():
 			if name == table_name: 
+				conflict = True
 				print('WARNING: there is already a table with this name in the schema')
 				print('[1] Append data on table\n' +
 					  '[2] Replace the table contents\n' + 
@@ -87,6 +89,9 @@ class Possum:
 					data_framed.to_sql(table_name, con=engine, index=False, if_exists='replace')
 				else:
 					self.quit()
+
+		if conflict == False:
+		 	data_framed.to_sql(table_name, con=engine, index=False)
 
 		'''with warnings.catch_warnings():
 				warnings.simplefilter("ignore", category=UserWarning)
@@ -254,11 +259,13 @@ class Possum:
 		    Sex VARCHAR(255), #Female taxpayers get a $500 deduction
 		    DoB DATE,
 		    ResAddress VARCHAR(255),
+		    ResAptNo VARCHAR(31), #new
 		    ResCity VARCHAR(255),
 		    ResState VARCHAR(2), #2 letter state code, "DC" counts as a state
 			NumDependents INT,
 		    #Should ResState include US territories like Puerto Rico (PR)?
 		    ResZIP VARCHAR(31), #non-numeric; ZIPs may include hyphens
+		    ResSSN NUMERIC (9,0), #new
 		    
 		    PRIMARY KEY (TID)
 		);
@@ -287,10 +294,17 @@ class Possum:
 			fake_data["Sex"].append(line['sex'])
 			fake_data["DoB"].append(line['birthdate'])
 			fake_data["ResAddress"].append(faker.street_address())
+			fake_data["ResAptNo"].append(faker.random_int(0, 999)) # Possibility this is also null
 			fake_data["ResCity"].append(faker.city())
 			fake_data["ResState"].append(faker.state())
 			fake_data["NumDependents"].append(faker.random_int(0, 12))
 			fake_data["ResZIP"].append(faker.postcode())
+
+			ssn = ''
+			for i in range(9):
+				ssn += str(faker.random_digit())
+
+			fake_data["ResSSN"].append(ssn)
 
 		print('data placed in dictionary')
 
@@ -594,6 +608,7 @@ class Possum:
 			EarnDate DATE NOT NULL,
 			TaxYear YEAR NOT NULL,
 			Amount INT,
+			Withheld INT, #new
 			
 			PRIMARY KEY (TID, EarnDate, TaxYear),
 			FOREIGN KEY (TID)
@@ -623,7 +638,9 @@ class Possum:
 
 			fake_data["EarnDate"].append(faker.date(pattern='%d-%m-%Y'))
 			fake_data["TaxYear"].append(self.fakeYearInRange())
-			fake_data['Amount'].append(faker.random_int(1,1000000))
+			earned = faker.random_int(1,1000000)
+			fake_data['Amount'].append(earned)
+			fake_data['Withheld'].append(0.10*earned) # withheld may be more than 10% of total
 			
 		print('data placed in dictionary')
 
