@@ -7,6 +7,7 @@ CREATE TABLE TaxReturn
 	MiddleInitial VARCHAR(1),
 	LastName VARCHAR(255),
 	SSN NUMERIC(9, 0), #do not hyphenate
+	SpouseTID NUMERIC(20, 0), #new
 	SpouseFirst VARCHAR(255),
 	SpouseMiddle VARCHAR(1),
 	SpouseLast VARCHAR(255),
@@ -15,7 +16,7 @@ CREATE TABLE TaxReturn
 	ResAptNo VARCHAR(31),
 	ResCity VARCHAR(255),
 	ResState VARCHAR(255),
-	ResZip VARCHAR(31),
+	ResZIP VARCHAR(31), #updated from ResZip to ResZIP.
 	ResFCountry VARCHAR(255),
 	ResFProvince VARCHAR(255), #or state, or county
 	ResFPostalCode VARCHAR(31),
