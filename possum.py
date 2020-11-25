@@ -75,7 +75,7 @@ class Possum:
 		inspector = inspect(engine)
 		for name in inspector.get_table_names():
 			if name == table_name: 
-				print('WARNING: there is already a table with this name in the schema') # TODO: check if user wants to add data to existing table or overwrite it
+				print('WARNING: there is already a table with this name in the schema')
 				print('[1] Append data on table\n' +
 					  '[2] Replace the table contents\n' + 
 					  '[3] Cancel action and quit\n')
