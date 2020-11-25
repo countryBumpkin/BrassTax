@@ -10,11 +10,13 @@ CREATE TABLE Taxpayer
     Sex VARCHAR(255), #Female taxpayers get a $500 deduction
     DoB DATE,
     ResAddress VARCHAR(255),
+	ResAptNo VARCHAR(31), #new
     ResCity VARCHAR(255),
     ResState VARCHAR(2), #2 letter state code, "DC" counts as a state
 	NumDependents INT,
     #Should ResState include US territories like Puerto Rico (PR)?
     ResZIP VARCHAR(31), #non-numeric; ZIPs may include hyphens
+	ResSSN NUMERIC (9,0), #new
     
     PRIMARY KEY (TID)
 );
@@ -108,6 +110,7 @@ CREATE TABLE Earnings
 	EarnDate DATE NOT NULL,
 	TaxYear YEAR NOT NULL,
 	Amount INT,
+	Withheld INT, #new
 	
 	PRIMARY KEY (TID, EarnDate, TaxYear),
 	FOREIGN KEY (TID)
