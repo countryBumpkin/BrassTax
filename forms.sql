@@ -6,8 +6,11 @@ CREATE TABLE TaxReturn
 	FirstName VARCHAR(255),
 	MiddleInitial VARCHAR(1),
 	LastName VARCHAR(255),
+	Age INT, #new
+	Sex VARCHAR(255), #new
+	DoB DATE, #new
 	SSN NUMERIC(9, 0), #do not hyphenate
-	SpouseTID NUMERIC(20, 0), #new
+	SpouseTID NUMERIC(20, 0),
 	SpouseFirst VARCHAR(255),
 	SpouseMiddle VARCHAR(1),
 	SpouseLast VARCHAR(255),
@@ -47,7 +50,11 @@ CREATE TABLE TaxReturn
 	StandardDeduction INT,
 	QualifiedBusinessIncomeDeduction INT,
 	SumStdDeductAndQualifiedBusn INT,
+	OtherTaxDeductibleExpenses INT, #new
+	TotalWithheldAlready INT, #new
 	TaxableIncome INT, #Subtract SumStdDeduct from AdjustedGrossIncome
+	ATITaxes INT, #new, use the graduated scale in the syllabus
+	TotalTaxOwed INT, #new, Subtract TotalWithheldAlready from ATITaxes.
 
 	PRIMARY KEY(TID, TRYear),
 	FOREIGN KEY (TID)

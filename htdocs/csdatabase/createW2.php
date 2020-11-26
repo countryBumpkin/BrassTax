@@ -50,7 +50,7 @@
 
             Check that no W2 exists with the entered TID, SID, and W2Year. If not, then...
            
-            Name -> EName , Address -> EAddress, EmployerZIP -> EZIP from Employers matching SID == SID.
+            Name -> EName, Address -> EAddress, EmployerZIP -> EZIP from Employers matching SID == SID.
             
             FirstName -> TFirst, MiddleInitial -> TMiddle, LastName -> TLast, ResAddress -> TAddress, ResCity -> TCity, ResState -> TState, ResZIP -> TZIP, TSSN from Taxpayer matching TID == TID.
             
@@ -58,7 +58,7 @@
             
             (Sum of all Withheld from Earnings matching TID == TID and W2Year == TaxYear) -> FedIncTax.
            
-            $SSWages = $SSTax = $MedicareWages = $MedicareTax = $SSTips = $AllocatedTips = $DependentCareBenefits = $StateWagesTipsEtc = $StateIncomeTax = $LocalWagesTipsEtc = $LocalIncomeTax = $LocalityName = ''; //Most of these are beyond the scope of this project, and it's not unusual for many of these to be blank in real-world W2s for many people anyways.
+            $SSWages = $SSTax = $MedicareWages = $MedicareTax = $SSTips = $AllocatedTips = $DependentCareBenefits = $StateWagesTipsEtc = $StateIncomeTax = $LocalWagesTipsEtc = $LocalIncomeTax = $LocalityName = 'NULL'; //Most of these are beyond the scope of this project, and it's not unusual for many of these to be blank in real-world W2s for many people anyways.
 
             Then INSERT all of these into W2. 
             $sql = "INSERT INTO W2
