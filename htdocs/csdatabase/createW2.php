@@ -44,32 +44,86 @@
             $TID = mysqli_real_escape_string($conn, $_POST['TID']);
             $SID = mysqli_real_escape_string($conn, $_POST['SID']);
             $W2Year = mysqli_real_escape_string($conn, $_POST['W2Year']);
-
-            /*
-            Need the following:
-
-            Check that no W2 exists with the entered TID, SID, and W2Year. If not, then...
-           
-            Name -> EName, Address -> EAddress, EmployerZIP -> EZIP from Employers matching SID == SID.
             
-            FirstName -> TFirst, MiddleInitial -> TMiddle, LastName -> TLast, ResAddress -> TAddress, ResCity -> TCity, ResState -> TState, ResZIP -> TZIP, TSSN from Taxpayer matching TID == TID.
-            
-            (Sum of all Amount from Earnings matching TID == TID and W2Year == TaxYear) -> WagesTipsEtc.
-            
-            (Sum of all Withheld from Earnings matching TID == TID and W2Year == TaxYear) -> FedIncTax.
-           
-            $SSWages = $SSTax = $MedicareWages = $MedicareTax = $SSTips = $AllocatedTips = $DependentCareBenefits = $StateWagesTipsEtc = $StateIncomeTax = $LocalWagesTipsEtc = $LocalIncomeTax = $LocalityName = 'NULL'; //Most of these are beyond the scope of this project, and it's not unusual for many of these to be blank in real-world W2s for many people anyways.
+            //Check that no W2 exists with the entered TID, SID, and W2Year. If not, then...
+            $result = mysqli_query($conn, "SELECT * FROM W2 WHERE TID = '$TID' AND SID = '$SID' AND W2Year = 'W2Year'");
+            if (mysqli_num_rows($result) == 0) {
 
-            Then INSERT all of these into W2. 
-            $sql = "INSERT INTO W2
-                    VALUES ('$TID', '$SID', '$W2Year', '$EName', '$EAddress', '$EZIP', '$TFirst', '$TMiddle', '$TLast', '$TAddress', '$TCity', '$TState', '$TZIP', '$TSSN', '$WagesTipsEtc', '$FedIncTax', '$SSWages', '$SSTax', '$MedicareWages', '$MedicareTax', '$SSTips', '$AllocatedTips', '$DependentCareBenefits', '$StateWagesTipsEtc', '$StateIncomeTax', '$LocalWagesTipsEtc', '$LocalIncomeTax', '$LocalityName')";
-            mysqli_query($conn, $sql);
-            $sql = 'SELECT * FROM W2 WHERE...';
-            
-            Then dump the results onto the page.
+                mysqli_free_result($result);
 
-            TODO: Page where you can lookup and display already-created W2s?
-            */
+                //Get info from Employers
+                $sql = "SELECT Name as EName, Address as EAddress, EmployerZIP as EZIP 
+                FROM Employers 
+                WHERE Employers.SID = '$SID'";
+                //get results and store em
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                $EName = $row["EName"];
+                $EAddress = $row["EAddress"];
+                $EZIP = $row["EZIP"];
+                mysqli_free_result($result);
+                $row = NULL;
+
+                //Get info from Taxpayer
+                $sql = "SELECT FirstName as TName, MiddleInitial as TMiddle, LastName as TLast, ResAddress as TAddress, ResCity as TCity, ResState as TState, ResZIP as TZIP, ResSSN as TSSN 
+                FROM Taxpayer 
+                WHERE Taxpayer.TID = '$TID'";
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                $TName = $row["TName"];
+                $TMiddle = $row["TMiddle"];
+                $TLast = $row["TLast"];
+                $TAddress = $row["TAddress"];
+                $TCity = $row["TCity"];
+                $TState = $row["TState"];
+                $TZIP = $row["TZIP"];
+                $TSSN = $row["TSSN"];
+                mysqli_free_result($result);
+                $row = NULL;
+                
+                //(Sum of all Amount from Earnings matching TID == TID and W2Year == TaxYear) -> WagesTipsEtc.
+
+                $sql = "SELECT SUM(Amount) as WagesTipsEtc
+                FROM Earnings 
+                WHERE Earnings.TID = '$TID' AND TaxYear = '$W2YEAR'";
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                $WagesTipsEtc = $row["WagesTipsEtc"];
+                mysqli_free_result($result);
+                $row = NULL;
+
+                //(Sum of all Withheld from Earnings matching TID == TID and W2Year == TaxYear) -> FedIncTax.
+
+                $sql = "SELECT SUM(Withheld) as FedIncTax
+                FROM Earnings 
+                WHERE Earnings.TID = '$TID' AND TaxYear = '$W2YEAR'";
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                $FedIncTax = $row["FedIncTax"];
+                mysqli_free_result($result);
+                $row = NULL;
+
+            
+                $SSWages = $SSTax = $MedicareWages = $MedicareTax = $SSTips = $AllocatedTips = $DependentCareBenefits = $StateWagesTipsEtc = $StateIncomeTax = $LocalWagesTipsEtc = $LocalIncomeTax = $LocalityName = ''; //Most of these are beyond the scope of this project, and it's not unusual for many of these to be blank in real-world W2s for many people anyways.
+
+                //Then INSERT all of these into W2. 
+                $sql = "INSERT INTO W2
+                        VALUES ('$TID', '$SID', '$W2Year', '$EName', '$EAddress', '$EZIP', '$TFirst', '$TMiddle', '$TLast', '$TAddress', '$TCity', '$TState', '$TZIP', '$TSSN', '$WagesTipsEtc', '$FedIncTax', '$SSWages', '$SSTax', '$MedicareWages', '$MedicareTax', '$SSTips', '$AllocatedTips', '$DependentCareBenefits', '$StateWagesTipsEtc', '$StateIncomeTax', '$LocalWagesTipsEtc', '$LocalIncomeTax', '$LocalityName')";
+                mysqli_query($conn, $sql);
+
+                //Then dump the results onto the page.
+                $sql = "SELECT * FROM W2 WHERE TID = '$TID' AND SID = '$SID' AND W2Year = 'W2Year'";
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                print_r($row);
+                mysqli_free_result($result);
+                $row = NULL;
+                
+                //TODO: Page where you can lookup and display already-created W2s?
+            }
+            else {
+                //entry already exists!
+            }
 
         }
     }
