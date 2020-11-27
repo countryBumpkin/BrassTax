@@ -69,7 +69,7 @@ class Possum:
 
 		print('\nTABLE ' + table_name + '\n' + data_framed.to_string() + '\n')
 
-		engine = create_engine('mysql+mysqlconnector://{user}:{password}@{server}/{database}'.format(user='root', password='GW091799', server='localhost', database=self.database_name), echo=False)
+		engine = create_engine('mysql+mysqlconnector://{user}:{password}@{server}/{database}'.format(user=self.user, password=self.password, server=self.server, database=self.database_name), echo=False)
 
 		# Check for conflicts
 		inspector = inspect(engine)
@@ -90,7 +90,7 @@ class Possum:
 				else:
 					self.quit()
 
-		if conflict == False:
+		   if conflict == False:
 		 	data_framed.to_sql(table_name, con=engine, index=False)
 
 		'''with warnings.catch_warnings():
@@ -215,7 +215,7 @@ class Possum:
 		Get a random tax category from the list of elements in this function
 	'''
 	def fakeTaxCategory(self):
-		return faker.random_element(elements=('high', 'mid', 'low')) # TODO: update to final tax categories
+		return faker.random_element(elements=('StudentLoanPlusInterest', 'HomeMortgageInterest', 'RentalRepair', 'Other')) # TODO: update to final tax categories
 
 	'''
 		Get a random year from a list
@@ -301,7 +301,7 @@ class Possum:
 			fake_data["ResZIP"].append(faker.postcode())
 
 			ssn = ''
-			for i in range(9):
+			for i in range(1, 9):
 				ssn += str(faker.random_digit())
 
 			fake_data["ResSSN"].append(ssn)
