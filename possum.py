@@ -75,6 +75,7 @@ class Possum:
 		inspector = inspect(engine)
 		conflict = False
 		for name in inspector.get_table_names():
+			#print(table_name + ' == ' + name)
 			if name == table_name: 
 				conflict = True
 				print('WARNING: there is already a table with this name in the schema')
@@ -90,12 +91,12 @@ class Possum:
 				else:
 					self.quit()
 
-		   if conflict == False:
-		 	data_framed.to_sql(table_name, con=engine, index=False)
+		if conflict == False:
+			data_framed.to_sql(table_name, con=engine, index=False)
 
-		'''with warnings.catch_warnings():
-				warnings.simplefilter("ignore", category=UserWarning)
-						'''
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore", category=UserWarning)
+					
 
 	''' 
 	Creates data for all these tables and adds them to the database, this should be the best way to generate complete data for testing
@@ -271,6 +272,7 @@ class Possum:
 		);
 	'''
 	def Taxpayer(self):
+		print('\n---Taxpayer---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -324,6 +326,7 @@ class Possum:
 		);
 	'''
 	def Employers(self):
+		print('\n---Employers---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -362,7 +365,7 @@ class Possum:
 
 	'''
 	def RentalProp(self):
-
+		print('\n---RentalProperties---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -404,7 +407,7 @@ class Possum:
 
 	'''
 	def Expenses(self, fk_TID={}):
-
+		print('\n---Expenses---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -447,7 +450,7 @@ class Possum:
 			);
 	'''
 	def IncomeS(self):
-
+		print('\n---Income Sources---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -496,7 +499,7 @@ class Possum:
 
 	'''
 	def EmpExpenses(self, fk_TID={}):
-
+		print('\n---Employee Expenses---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -555,7 +558,7 @@ class Possum:
 		);
 	'''
 	def LoanExpenses(self, fk_TID={}):
-
+		print('\n---Loan Expenses---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -617,7 +620,7 @@ class Possum:
 		);
 	'''
 	def Earnings(self, fk_TID={}):
-
+		print('\n---Earnings---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -670,7 +673,7 @@ class Possum:
 		);
 	'''
 	def EmploymentEarnings(self, fk_TID={}, fk_SID={}):
-
+		print('\n---Employment Earnings---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -731,7 +734,7 @@ class Possum:
 		);
 	'''
 	def RentEarnings(self, fk_taxpayer_TID={}, fk_rentalprop_SID={}, fk_renter_TID={}):
-
+		print('\n---Rent Earnings---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -792,7 +795,7 @@ class Possum:
 		);
 	'''
 	def WorksFor(self, fk_taxpayer_TID={}, fk_employers_SID={}):
-
+		print('\n---Works For---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -843,7 +846,7 @@ class Possum:
 		);
 	'''
 	def Owns(self, fk_taxpayer_TID={}, fk_rentalprop_SID={}):
-
+		print('\n---Owns---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
@@ -898,7 +901,7 @@ class Possum:
 		);
 	'''
 	def Rents(self, fk_taxpayer_TID={}, fk_taxpayer2_TID={}, fk_rentalprop_SID={}):
-
+		print('\n---Rents---\n')
 		count = int(input("enter number of rows to generate: "))
 
 		fake_data = defaultdict(list)
