@@ -35,71 +35,77 @@
             $TRYear = mysqli_real_escape_string($conn, $_POST['TRYear']);
 
             /*
-            Need the following:
+            Entered on this page:
+            TID
+            TRYear
+            FilingStatus (Single, MarriedFilingJointly, MarriedFilingSeparately)
+            SpouseTID (Blank unless MarriedFilingJointly)
+            SpouseBlind (Blank unless MarriedFilingJointly, otherwise Yes/No)
+            AmBlind (Yes/No)
+            AmWoundedArmedForces (Yes/No)
+            ResFCountry, ResFProvince, ResFPostalCode, AmDependent, SpouseDependent, SpouseItemizesOrDualStatus need to be entered on this page. AmDependent cannot be blank (Yes/No), and if there is a Spouse, SpouseDependent (Yes/No) cannot be blank either.
+
+            -----------------------------------
+
+            Calculated:
 
             Check that no TaxReturn exists with the entered TID and TRYear. If not, then...
 
-            FilingStatus needs to be entered on this page.
+            FirstName -> FirstName, MiddleInitial -> MiddleInitial, LastName -> LastName, Age -> Age, Sex -> Sex, DoB -> DoB, ResSSN -> SSN, ResAddress -> ResAddress, ResAptNo -> ResAptNo, ResCity -> ResCity, ResState -> ResState, ResZIP -> ResZIP from Taxpayer matching TID == TID.
             
-            SpouseTID needs to be entered on this page, and should be able to be blank.
-
-            FirstName -> FirstName, MiddleInitial -> MiddleInitial, LastName -> LastName, ResSSN -> SSN, ResAddress -> ResAddress, ResAptNo -> ResAptNo, ResCity -> ResCity, ResState -> ResState, ResZIP -> ResZIP from Taxpayer matching TID == TID.
-            
-            If SpouseTID != '', then...
+            If SpouseTID != '' and FilingStatus == 'MarriedFilingJointly', then...
             FirstName -> SpouseFirst, MiddleInitial -> SpouseMiddle, LastName -> LastName, ResSSN -> SSN from Taxpayer matching TID == TID.
             Else, they all = ''.
 
-            ResFCountry, ResFProvince, ResFPostalCode, AmDependent, SpouseDependent, SpouseItemizesOrDualStatus need to be entered on this page. AmDependent cannot be blank, and if there is a Spouse, SpouseDependent cannot be blank either.
+            BornBefore1955 (January 2nd) should be calculated using Taxpayer's DoB (Yes/No).
 
-            BornBefore1955 should be calculated using Taxpayer's DoB.
-
-            AmBlind needs to be entered on this page.
-
-            SpouseBornBefore1955 should be blank if no SpouseTID. Else calculated from Spouse's Taxpayer's DoB.
-
-            SpouseBlind may be blank if no SpouseTID. Else should be entered.
+            if (SpouseTID == '')
+                SpouseBornBefore1955 = ''; 
+            Else calculated from Spouse's Taxpayer's DoB (Yes/No).
 
             Wages should be the sum of all WagesTipsEtc from all W2s where TID == TID.
 
-            TaxExemptInterest should be the sum of all Amount in Expenses where TID == TID and TaxCategory == ???.
+            TaxExemptInterest should be the sum of all Amount in Expenses where TID == TID and TaxCategory == 'HomeMortgageInterests' and TaxYear = TRYear.
 
-            TaxableInterest should be the sum of all Amount in Expenses where TID == TID and TaxCategory == ???.
+            TaxableInterest = '0'; //should be the sum of all Amount in Expenses where TID == TID and TaxCategory == ???. //beyond the scope of this project atm
 
-            QualifiedDividends ???
+            $QualifiedDividends = $OrdinaryDividends = $IRADistributions = $IRATaxable = $PensionsAndAnnuities = $TaxablePensionsAndAnnuities = $SocialSecurityBenefits = $TaxableSSB = $CapitalGainLoss = '0'; 
+            
+            $CapitalGainLossNotRequired = '';
 
-            OrdinaryDividends ???
+            OtherIncome should be the sum of Amount in Earnings AND RentalEarnings where TID = TID and TRYear = TaxYear.
 
-            IRADistributions ???
+            $TotalIncome = $Wages + $TaxableInterest + $OrdinaryDividends + $IRATaxable + $TaxablePensions + $TaxableSSB + $CapitalGainLoss + $OtherIncome;
 
-            IRATaxable ???
+            $AdjustmentsToIncome = '0';
 
-            PensionsAndAnnuities ???
+            $AdjustedGrossIncome = $TotalIncome - $AdjustmentsToIncome;
 
-            TaxablePensionsAndAnnuities ???
+            StandardDeduction is...
+            if ($AmWoundedArmedForces == 'Yes')
+                $StandardDeduction = '5000';
+            elseif ($AmBlind = 'Yes')
+                $StandardDeduction = '3750';
+            elseif ($Sex == 'Female' || $Age >= 65)
+                $StandardDeduction = '3500';
+            else
+                $StandardDeduction = '3000';
 
-            SocialSecurityBenefits ???
+            $QualifiedBusinessIncomeDeduction = '0';
 
-            TaxableSSB ???
+            $SumStdDeductAndQualifiedBusn = $StandardDeduction + $QualifiedBusinessIncomeDeduction;
 
-            CapitalGainLoss ???
+            OtherTaxDeductibleExpenses should be the sum of Amount in Expenses where TID = TID, TRYear = TaxYear, and TaxCategory = 'StudentLoanPlusInterest' or 'RentalRepair', PLUS the sum of Amount in EmploymentExpenses where TID = TID and TRYear = TaxYear.
 
-            CapitalGainLossNotRequired ???
+            TotalWithheldAlready should be the sum of TaxWithheld from Earnings, EmploymentEarnings, and RentalEarnings, where TID = TID and TRYear = TaxYear.
 
-            OtherIncome ???
+            $TaxableIncome = $AdjustedGrossIncome - $SumStdDeductAndQualifiedBusn - $OtherTaxDeductibleExpenses
 
-            TotalIncome is the sum of Wages, TaxableInterest, OrdinaryDividends, IRATaxable, TaxablePensions, TaxableSSB, CapitalGainLoss, and OtherIncome.
+            $ATITaxes uses the graduated scale in the syllabus.
 
-            AdjustmentsToIncome ???
+            $TotalTaxOwed = $ATITaxes - $TotalWithheldAlready
 
-            AdjustedGrossIncome is equal to TotalIncome minus AdjustmentsToIncome.
 
-            StandardDeduction ??? //covered in syllabus
-
-            QualifiedBusinessIncomeDeduction ???
-
-            SumStdDeductAndQualifiedBusn is the sum of StandardDeduction and QualifiedBusinessIncomeDeduction.
-
-            TaxableIncome is equal to AdjustedGrossIncome minus SumStdDeductAndQualifiedBusn.
 
             Then INSERT all of these into TaxReturn.
 

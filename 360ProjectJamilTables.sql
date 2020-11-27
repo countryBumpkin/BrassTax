@@ -10,13 +10,13 @@ CREATE TABLE Taxpayer
     Sex VARCHAR(255), #Female taxpayers get a $500 deduction
     DoB DATE,
     ResAddress VARCHAR(255),
-	ResAptNo VARCHAR(31), #new
+	ResAptNo VARCHAR(31),
     ResCity VARCHAR(255),
     ResState VARCHAR(2), #2 letter state code, "DC" counts as a state
 	NumDependents INT,
     #Should ResState include US territories like Puerto Rico (PR)?
     ResZIP VARCHAR(31), #non-numeric; ZIPs may include hyphens
-	ResSSN NUMERIC (9,0), #new
+	ResSSN NUMERIC (9,0),
     
     PRIMARY KEY (TID)
 );
@@ -48,7 +48,7 @@ CREATE TABLE Expenses
 	EPDate DATE NOT NULL,
 	TaxYear YEAR NOT NULL,
 	Description VARCHAR(255) NOT NULL,
-	TaxCategory VARCHAR(255) NOT NULL,
+	TaxCategory VARCHAR(255) NOT NULL, #StudentLoanPlusInterest, HomeMortgageInterest, RentalRepair, or Other
 	Amount INT NOT NULL,
 	
 	PRIMARY KEY (TID, EPDate, TaxYear, Description, TaxCategory),
@@ -110,7 +110,7 @@ CREATE TABLE Earnings
 	EarnDate DATE NOT NULL,
 	TaxYear YEAR NOT NULL,
 	Amount INT,
-	Withheld INT, #new
+	TaxWithheld INT, #new (renamed)
 	
 	PRIMARY KEY (TID, EarnDate, TaxYear),
 	FOREIGN KEY (TID)
@@ -124,7 +124,7 @@ CREATE TABLE EmploymentEarnings
 	EarnDate DATE NOT NULL,
 	TaxYear YEAR NOT NULL,
 	Amount INT,
-	TaxWithheld INT,
+	TaxWithheld INT, #new?
 	EmployerID NUMERIC(20, 0) NOT NULL,
 	RetirementContributions INT,
 	
@@ -145,6 +145,8 @@ CREATE TABLE RentalEarnings
 	HomeID NUMERIC(20, 0) NOT NULL,
 	RenterID NUMERIC(20, 0) NOT NULL,
 	Amount INT,
+	TaxWithheld INT, #new?
+	
 	
 	PRIMARY KEY (TID, EarnDate, TaxYear, HomeID, RenterID),
 	FOREIGN KEY (TID)
