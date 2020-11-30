@@ -2,7 +2,7 @@
 
     include('db_connect.php');  
 
-    $TID = $date = $year = $homeID = $renterID = $amount = '';
+    $TID = $date = $year = $homeID = $renterID = $amount = $withheld = '';
     $errors = array('TID' => '', 'date'=>'', 'year'=>'', 'homeID'=>'', 'renterID'=>'', 'amount'=>'');
     
     if(isset($_POST['submit'])){
@@ -66,6 +66,16 @@
             }
         }
 
+        if(empty($_POST['withheld'])){
+            $errors['withheld'] = '\'Withheld\' is required <br />';
+        }
+        else{
+            $withheld = $_POST['withheld'];
+            if(!preg_match('/^([0-9]+(\.[0-9]*){0,1})*$/', $amount)){
+                $errors['withheld'] = 'Withheld must contain only numbers <br />';
+            }
+        }
+
         if(array_filter($errors)){
             //echo 'errors';
         }
@@ -78,10 +88,11 @@
             $homeID = mysqli_real_escape_string($conn, $_POST['homeID']);
             $renterID = mysqli_real_escape_string($conn, $_POST['renterID']);
             $amount = mysqli_real_escape_string($conn, $_POST['amount']);
+            $withheld = mysqli_real_escape_string($conn, $_POST['withheld']);
 
             // create sql
-            $sql = "INSERT INTO rentalearnings(TID, EarnDate, TaxYear, HomeID, RenterID, Amount)
-                    VALUES('$TID', '$date', '$year', '$homeID', '$renterID', '$amount' )";
+            $sql = "INSERT INTO rentalearnings(TID, EarnDate, TaxYear, HomeID, RenterID, Amount, TaxWithheld)
+                    VALUES('$TID', '$date', '$year', '$homeID', '$renterID', '$amount', '$withheld')";
 
             // save to database and check if it was sucessfull
             if(mysqli_query($conn, $sql)){
@@ -129,6 +140,10 @@
             <label>Amount</label>
             <input type="text" name="amount" value="<?php echo htmlspecialchars($amount)?>">
             <div class="red-text"><?php echo $errors['amount']; ?></div>
+
+            <label>Tax Withheld</label>
+            <input type="text" name="withheld" value="<?php echo htmlspecialchars($withheld)?>">
+            <div class="red-text"><?php echo $errors['withheld']; ?></div>
             <div class="center">
                 <input type="submit" name="submit" value ="submit" 
                 class="btn buttonColor z-depth-0">

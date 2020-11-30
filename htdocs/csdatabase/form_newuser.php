@@ -2,9 +2,9 @@
 
     include('db_connect.php');  
 
-    $TID = $firstName = $middleInitial = $lastName = $age = $sex = $DoB = $address = $city = $state = $zip = $dependents = '';
+    $TID = $firstName = $middleInitial = $lastName = $age = $sex = $DoB = $address = $city = $state = $zip = $dependents = $SSN = '';
     $errors = array('TID' => '', 'firstName' => '', 'middleInitial' => '', 'lastName' => '', 'age' => '', 'sex' => '', 'DoB' => '',
-                    'address' => '', 'city' => '', 'state' => '', 'zip' => '', 'dependents'  => '');
+                    'address' => '', 'city' => '', 'state' => '', 'zip' => '', 'dependents'  => '', 'SSN' => '');
     
     if(isset($_POST['submit'])){
         if(empty($_POST['TID'])){
@@ -127,6 +127,16 @@
             }
         }
 
+        if(empty($_POST['SSN'])){
+            $errors['SSN'] = 'A \'Personal SSN Number\' is required <br />';
+        }
+        else{
+            $SSN = $_POST['SSN'];
+            if(!preg_match('/^[0-9]{9}$/', $SSN)){ //{#} is the length it will match
+                $errors['SSN'] = 'SSN must only be numbers with a length of 9 <br />';
+            }
+        }
+
         if(array_filter($errors)){
             //echo 'errors';
         }
@@ -144,10 +154,11 @@
             $state = mysqli_real_escape_string($conn, $_POST['state']);
             $dependents = mysqli_real_escape_string($conn, $_POST['dependents']);
             $zip = mysqli_real_escape_string($conn, $_POST['zip']);
+            $SSN = mysqli_real_escape_string($conn, $_POST['SSN']);
 
             // create sql
-            $sql = "INSERT INTO taxpayer(TID, FirstName, MiddleInitial, LastName, Age, Sex, DoB, ResAddress, ResCity, ResState, NumDependents, ResZip)
-                    VALUES('$TID', '$firstName', '$middleInitial', '$lastName', '$age' , '$sex' , '$DoB' , '$address' , '$city' , '$state' , '$dependents', '$zip')";
+            $sql = "INSERT INTO taxpayer(TID, FirstName, MiddleInitial, LastName, Age, Sex, DoB, ResAddress, ResCity, ResState, NumDependents, ResZip, ResSSN)
+                    VALUES('$TID', '$firstName', '$middleInitial', '$lastName', '$age' , '$sex' , '$DoB' , '$address' , '$city' , '$state' , '$dependents', '$zip', '$SSN')";
 
             // save to database and check if it was sucessfull
             if(mysqli_query($conn, $sql)){
@@ -208,6 +219,9 @@
             <label>Number of Dependents</label>
             <input type="text" name="dependents" value="<?php echo htmlspecialchars($dependents)?>">
             <div class="red-text"><?php echo $errors['dependents']; ?></div>
+            <label>Social Security Number</label>
+            <input type="text" name="SSN" value="<?php echo htmlspecialchars($SSN)?>">
+            <div class="red-text"><?php echo $errors['SSN']; ?></div>
             <div class="center">
                 <input type="submit" name="submit" value ="submit" 
                 class="btn buttonColor z-depth-0">

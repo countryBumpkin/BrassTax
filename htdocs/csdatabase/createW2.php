@@ -84,9 +84,9 @@
                 mysqli_free_result($result);
                 $row = NULL;
                 
-                //(Sum of all Amount from EmploymentEarnings matching TID == TID and W2Year == TaxYear) -> WagesTipsEtc.
+                //(Sum of all Amount from Earnings matching TID == TID and W2Year == TaxYear) -> WagesTipsEtc.
                 //Row offset doesn't work.
-                $sql = "SELECT SUM(Amount) as WagesTipsEtc FROM EmploymentEarnings WHERE TID = '$TID' AND TaxYear = '$W2Year'";
+                $sql = "SELECT SUM(Amount) as WagesTipsEtc FROM Earnings WHERE Earnings.TID = '$TID' AND TaxYear = '$W2Year'";
                 $result = mysqli_query($conn, $sql);
                 $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 //if (array_key_exists('WagesTipsEtc', $row) && !empty($row['WagesTipsEtc']))
@@ -97,9 +97,9 @@
                 mysqli_free_result($result);
                 $row = NULL;
 
-                //(Sum of all Withheld from EmploymentEarnings matching TID == TID and W2Year == TaxYear) -> FedIncTax.
+                //(Sum of all Withheld from Earnings matching TID == TID and W2Year == TaxYear) -> FedIncTax.
                 //$result is a boolean
-                $sql = "SELECT SUM(TaxWithheld) as FedIncTax FROM EmploymentEarnings WHERE TID = $TID AND TaxYear = $W2Year";
+                $sql = "SELECT SUM(TaxWithheld) as FedIncTax FROM Earnings WHERE TID = $TID AND TaxYear = $W2Year";
                 $result = mysqli_query($conn, $sql);
                 $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 $FedIncTax = $row[0]["FedIncTax"];
