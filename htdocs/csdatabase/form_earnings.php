@@ -67,7 +67,7 @@
             $withheld = mysqli_real_escape_string($conn, $_POST['withheld']);
 
             // create sql
-            $sql = "INSERT INTO earnings(TID, EarnDate, TaxYear, Amount, TaxWithheld)
+            $sql = "INSERT INTO earnings(TID, EarnDate, TaxYear, Amount, Withheld)
                     VALUES('$TID', '$date', '$year', '$amount', '$withheld')";
 
             // save to database and check if it was sucessfull
