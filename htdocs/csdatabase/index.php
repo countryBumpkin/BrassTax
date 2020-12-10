@@ -14,24 +14,17 @@
     $sql = 'SELECT TID, FirstName FROM taxpayer';
     // make query and get results
     $res = mysqli_query($conn, $sql);
+
     // store results into an array
-    $results = mysqli_fetch_array($res, MYSQLI_ASSOC);
-    //$results = $res->fetch_assoc() // alternative to msqli functions
-
-
-    printf("size of results = " + sizeof($results) + "\n");
-    foreach($results as $result){
-        echo htmlspecialchars($results["TID"]);
-        echo htmlspecialchars($results["FirstName"]);
+    $res_array = array();
+    while($row = mysqli_fetch_assoc($res)){
+        array_push($res_array, $row);
     }
 
     // free result from memory
     mysqli_free_result($res);
     // close connection
     mysqli_close($conn);
-
-    //print_r($results);
-
 ?>
 
 <!DOCTYPE html>
@@ -43,16 +36,15 @@
 
     <div class="container">
         <div class="row">
-            <?php foreach($results as $result){ ?>
+            <?php foreach($res_array as $row){ ?>
                 <div class="col s6">
                     <div class="card z-depth-0">
                         <div class="card-content center">
                             <h6>
-                                <?php echo htmlspecialchars($result['TID']); ?>
-                                <!-- <?php printf("%u", $result['TID']); ?> -->
+                                <?php echo htmlspecialchars($row['TID']); ?>
                             </h6>
-                            <div><!-- <?php echo htmlspecialchars($result['FirstName']); ?> -->
-                                <?php printf("%s", $result['FirstName']); ?> 
+                            <div> 
+                                <?php echo htmlspecialchars($row['FirstName']); ?>
                             </div>
                         </div>
                     </div>
