@@ -1,5 +1,6 @@
 <?php
     include('db_connect.php');
+    $completedTR = null;
 
     $TID = $TRYear = $FilingStatus = $SpouseTID = $SpouseBlind = $AmBlind = $AmWoundedArmedForces = '';
     $errors = array('TID' => '', 'TRYear' => '', 'FilingStatus' => '', 'SpouseTID' => '', 'SpouseBlind' => '', 'AmBlind' => '', 'AmWoundedArmedForces' => '');
@@ -32,6 +33,8 @@
             if(!preg_match('/^[0-9]{20}$/', $SpouseTID)){ //{#} is the length it will match
                 $errors['SpouseTID'] = 'SpouseTID must only be blank or numbers with a length of 20 <br />';
             }
+        }else{
+            $SpouseTID = 0;
         }
 
         if(array_filter($errors)){
@@ -66,7 +69,14 @@
             //Taxpayer basic info
             $sql = "SELECT FirstName, MiddleInitial, LastName, Age, Sex, DoB, ResSSN as SSN, ResAddress, ResAptNo, ResCity, ResState, ResZIP FROM taxpayer WHERE TID = '$TID'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" Taxpayer basic info: ");
             //print_r($row);
             if (array_key_exists('FirstName', $row[0]) && !empty($row[0]['FirstName']))
@@ -122,9 +132,16 @@
 
             //Spouse basic info
             if ($SpouseTID != '' and $FilingStatus == "MarriedFilingJointly") {
-                $sql = "SELECT FirstName as SpouseFirst, MiddleInitial as SpouseMiddle, LastName as SpouseLast, ResSSN as SpouseSSN, DoB as SpouseDoB FROM Taxpayer WHERE TID = '$SpouseTID'";
+                $sql = "SELECT FirstName as SpouseFirst, MiddleInitial as SpouseMiddle, LastName as SpouseLast, ResSSN as SpouseSSN, DoB as SpouseDoB FROM taxpayer WHERE TID = '$SpouseTID'";
                 $result = mysqli_query($conn, $sql);
-                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                if(!$result){
+                echo "Error@135: " . mysqli_error($conn);
+                }
+                //fill array with query results
+                $row = array();
+                while($curr_row = mysqli_fetch_assoc($result)){
+                    array_push($row, $curr_row);
+                }
                 //print(" Spouse basic info: ");
                 //print_r($row);
                 if (array_key_exists('SpouseFirst', $row[0]) && !empty($row[0]['SpouseFirst']))
@@ -142,7 +159,7 @@
                 if (array_key_exists('SpouseSSN', $row[0]) && !empty($row[0]['SpouseSSN']))
                     $SpouseSSN = $row[0]["SpouseSSN"];
                 else
-                    $SpouseSSN = '';
+                    $SpouseSSN = 0;
                 if (array_key_exists('SpouseDoB', $row[0]) && !empty($row[0]['SpouseDoB']))
                     $SpouseDoB = $row[0]["SpouseDoB"];
                 else
@@ -151,7 +168,7 @@
                 $row = NULL;
             }
             else {
-                $SpouseFirst = $SpouseMiddle = $SpouseLast = $SpouseSSN = $SpouseDoB = '';
+                $SpouseFirst = $SpouseMiddle = $SpouseLast = $SpouseSSN = $SpouseDoB = 0;
             }
 
             //BornBefore1955
@@ -173,9 +190,16 @@
                 $SpouseBornBefore1955 = '';
             
             //Wages
-            $sql = "SELECT SUM(WagesTipsEtc) AS Wages FROM W2 WHERE W2Year = '$TRYear' AND TID = '$TID'";
+            $sql = "SELECT SUM(WagesTipsEtc) AS Wages FROM w2 WHERE W2Year = '$TRYear' AND TID = '$TID'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@193: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" WagesTipsEtc: ");
             //print_r($row);
             if (array_key_exists('Wages', $row[0]) && !empty($row[0]['Wages']))
@@ -186,9 +210,16 @@
             $row = NULL;
 
             //TaxExemptInterest
-            $sql = "SELECT SUM(Amount) AS TaxExemptInterest FROM Expenses WHERE TID = '$TID' AND TaxCategory = 'HomeMortgageInterests'";
+            $sql = "SELECT SUM(Amount) AS TaxExemptInterest FROM expenses WHERE TID = '$TID' AND TaxCategory = 'HomeMortgageInterests'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@213: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" TaxExemptInterest: ");
             //print_r($row);
             if (array_key_exists('TaxExemptInterest', $row[0]) && !empty($row[0]['TaxExemptInterest']))
@@ -206,9 +237,16 @@
             $CapitalGainLossNotRequired = '';
 
             //OtherIncome
-            $sql = "SELECT SUM(Amount) AS SumEarnings FROM Earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(Amount) AS SumEarnings FROM earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@240: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" OtherIncome: ");
             //print_r($row);
             if (array_key_exists('SumEarnings', $row[0]) && !empty($row[0]['SumEarnings']))
@@ -218,9 +256,16 @@
             mysqli_free_result($result);
             $row = NULL;
 
-            $sql = "SELECT SUM(Amount) AS SumRental FROM RentalEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(Amount) AS SumRental FROM rentalearnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@259: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" OtherIncome2: ");
             //print_r($row);
             if (array_key_exists('SumRental', $row[0]) && !empty($row[0]['SumRental']))
@@ -255,9 +300,16 @@
             $SumStdDeductAndQualifiedBusn = $StandardDeduction + $QualifiedBusinessIncomeDeduction;
 
             //OtherTaxDeductibleExpenses
-            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleExpenses FROM Expenses WHERE TID = '$TID' AND TaxYear = '$TRYear' AND (TaxCategory = 'StudentLoanPlusInterest' OR TaxCategory = 'RentalRepair')";
+            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleExpenses FROM expenses WHERE TID = '$TID' AND TaxYear = '$TRYear' AND (TaxCategory = 'StudentLoanPlusInterest' OR TaxCategory = 'RentalRepair')";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@303: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" OtherTaxDeductibleExpenses: ");
             //print_r($row);
             if (array_key_exists('SumTaxDeductibleExpenses', $row[0]) && !empty($row[0]['SumTaxDeductibleExpenses']))
@@ -267,9 +319,16 @@
             mysqli_free_result($result);
             $row = NULL;
             
-            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleEmplExpenses FROM EmploymentExpenses WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleEmplExpenses FROM employmentexpenses WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@322: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" SumTaxDeductibleEmplExpenses: ");
             //print_r($row);
             if (array_key_exists('SumTaxDeductibleEmplExpenses', $row[0]) && !empty($row[0]['SumTaxDeductibleEmplExpenses']))
@@ -282,9 +341,16 @@
             $OtherTaxDeductibleExpenses = $SumTaxDeductibleExpenses + $SumTaxDeductibleEmplExpenses;
 
             //TotalWithheldAlready
-            $sql = "SELECT SUM(TaxWithheld) AS WithheldEarnings FROM Earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(Withheld) AS WithheldEarnings FROM earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@344: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" WithheldEarnings: ");
             //print_r($row);
             if (array_key_exists('WithheldEarnings', $row[0]) && !empty($row[0]['WithheldEarnings']))
@@ -294,9 +360,16 @@
             mysqli_free_result($result);
             $row = NULL;
 
-            $sql = "SELECT SUM(TaxWithheld) AS WithheldEmpEarnings FROM EmploymentEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(TaxWithheld) AS WithheldEmpEarnings FROM employmentearnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error363: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" WithheldEmpEarnings: ");
             //print_r($row);
             if (array_key_exists('WithheldEmpEarnings', $row[0]) && !empty($row[0]['WithheldEmpEarnings']))
@@ -306,9 +379,16 @@
             mysqli_free_result($result);
             $row = NULL;
 
-            $sql = "SELECT SUM(TaxWithheld) AS WithheldRentEarnings FROM RentalEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $sql = "SELECT SUM(TaxWithheld) AS WithheldRentEarnings FROM rentalearnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            if(!$result){
+                echo "Error@382: " . mysqli_error($conn);
+            }
+            //fill array with query results
+            $row = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($row, $curr_row);
+            }
             //print(" WithheldRentEarnings: ");
             //print_r($row);
             if (array_key_exists('WithheldRentEarnings', $row[0]) && !empty($row[0]['WithheldRentEarnings']))
@@ -397,14 +477,27 @@
             */
 
             //Then INSERT all of these into TaxReturn.
-            $sql = "INSERT INTO TaxReturn VALUES ('$TID', '$TRYear', '$FilingStatus', '$FirstName', '$MiddleInitial', '$LastName', '$Age', '$Sex', '$DoB', '$SSN', '$SpouseTID', '$SpouseFirst', '$SpouseMiddle', '$SpouseLast', '$SpouseSSN', '$ResAddress', '$ResAptNo', '$ResCity', '$ResState', '$ResZIP', '$ResFCountry', '$ResFProvince', '$ResFPostalCode', '$AmDependent', '$SpouseDependent', '$SpouseItemizesOrDualStatus', '$BornBefore1955', '$AmBlind', '$SpouseBornBefore1955', '$SpouseBlind', '$Wages', '$TaxExemptInterest', '$TaxableInterest', '$QualifiedDividends', '$OrdinaryDividends', '$IRADistributions', '$IRATaxable', '$PensionsAndAnnuities', '$TaxablePensionsAndAnnuities', '$SocialSecurityBenefits', '$TaxableSSB', '$CapitalGainLoss', '$CapitalGainLossNotRequired', '$OtherIncome', '$TotalIncome', '$AdjustmentsToIncome', '$AdjustedGrossIncome', '$StandardDeduction', '$QualifiedBusinessIncomeDeduction', '$SumStdDeductAndQualifiedBusn', '$OtherTaxDeductibleExpenses', '$TotalWithheldAlready', '$TaxableIncome', '$ATITaxes', '$TotalTaxOwed')";
-            mysqli_query($conn, $sql);
+            $sql = "INSERT INTO taxreturn VALUES ('$TID', '$TRYear', '$FilingStatus', '$FirstName', '$MiddleInitial', '$LastName', '$Age', '$Sex', '$DoB', '$SSN', '$SpouseTID', '$SpouseFirst', '$SpouseMiddle', '$SpouseLast', '$SpouseSSN', '$ResAddress', '$ResAptNo', '$ResCity', '$ResState', '$ResZIP', '$ResFCountry', '$ResFProvince', '$ResFPostalCode', '$AmDependent', '$SpouseDependent', '$SpouseItemizesOrDualStatus', '$BornBefore1955', '$AmBlind', '$SpouseBornBefore1955', '$SpouseBlind', '$Wages', '$TaxExemptInterest', '$TaxableInterest', '$QualifiedDividends', '$OrdinaryDividends', '$IRADistributions', '$IRATaxable', '$PensionsAndAnnuities', '$TaxablePensionsAndAnnuities', '$SocialSecurityBenefits', '$TaxableSSB', '$CapitalGainLoss', '$CapitalGainLossNotRequired', '$OtherIncome', '$TotalIncome', '$AdjustmentsToIncome', '$AdjustedGrossIncome', '$StandardDeduction', '$QualifiedBusinessIncomeDeduction', '$SumStdDeductAndQualifiedBusn', '$OtherTaxDeductibleExpenses', '$TotalWithheldAlready', '$TaxableIncome', '$ATITaxes', '$TotalTaxOwed')";
+            $result = mysqli_query($conn, $sql);
+            if(!$result){
+                //echo "Error@480: " . mysqli_error($conn);
+            }
 
             //Dump the results onto the page.
-            $sql = "SELECT * FROM TaxReturn WHERE TID = '$TID' AND TRYear = '$TRYear'";
+            $sql = "SELECT * FROM taxreturn WHERE TID = '$TID' AND TRYear = '$TRYear'";
             $result = mysqli_query($conn, $sql);
-            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            print_r($row);
+            if(!$result){
+                echo "Error@484: " . mysqli_error($conn);
+            }else{
+                echo mysqli_num_rows($result);
+            }
+            //fill array with query results
+            $completedTR = array();
+            while($curr_row = mysqli_fetch_assoc($result)){
+                array_push($completedTR, $curr_row);
+            }
+
+            //print_r($compeletedTR);
             //var_dump($result);
             mysqli_free_result($result);
             $row = NULL;
@@ -415,6 +508,34 @@
     }
     
 ?>
+
+<head>
+    <style type="text/css">
+        .label-text{
+            /*width: 75%;
+            border-radius: 5px;
+            padding: 5px;*/
+            font-weight:bold;
+            /*background: #E27D60  !important;*/
+        }
+
+        .label-user-header{
+            background: #8c8c8c;
+            padding: 30px;
+            border-radius: 3px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .flex-container{
+            display: flex;
+        }
+
+        .flex-child{
+            flex: 1;
+        }
+    </style>
+</head>
 
 <!DOCTYPE html>
 <html>
@@ -458,6 +579,45 @@
                 <input type="submit" name="submit" value ="submit" 
                 class="btn buttonColor z-depth-0">
             </div>
+        </form>
+    </section>
+
+    <section class="container grey-text">
+        <h4 class="center">Completed Tax Returns</h4>
+        <form class="white" action="createW2.php" method="POST">
+            <?php 
+                foreach($completedTR as $row_curr){
+                    ?>
+
+                    <html>
+                        <div class="col s6">
+                            <div class="card z-depth-0">
+                                <div class="card-content center">
+                                    <h5 class="label-user-header">
+                                        <font color="black">
+                                            <?php echo htmlspecialchars($row_curr['FirstName'] . " " . $row_curr['LastName']); ?>
+                                        </font>
+                                    </h5>
+                                    <?php foreach ($row_curr as $key => &$value) { ?>
+                                    <div class="flex-container">
+                                        <div class="flex-child label-text" align = "left"> 
+                                            <font color="black">
+                                                <?php echo htmlspecialchars($key);?>
+                                            </font>
+                                        </div>
+                                        <div  class="flex-child" align = "right"> 
+                                            <?php echo htmlspecialchars($value);?>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                    </html>
+            <?php }
+            $completedTR = NULL;
+            ?>
+        </form>
         </form>
     </section>
 
