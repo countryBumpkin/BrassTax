@@ -1,8 +1,8 @@
 <?php
     include('db_connect.php');
 
-    $TID = $TRYear = '';
-    $errors = array('TID' => '', 'TRYear' => '');
+    $TID = $TRYear = $FilingStatus = $SpouseTID = $SpouseBlind = $AmBlind = $AmWoundedArmedForces = '';
+    $errors = array('TID' => '', 'TRYear' => '', 'FilingStatus' => '', 'SpouseTID' => '', 'SpouseBlind' => '', 'AmBlind' => '', 'AmWoundedArmedForces' => '');
 
     if(isset($_POST['submit'])){
         
@@ -27,6 +27,13 @@
             }
         }
 
+        if(!empty($_POST['SpouseTID'])){
+            $SpouseTID = $_POST['SpouseTID'];
+            if(!preg_match('/^[0-9]{20}$/', $SpouseTID)){ //{#} is the length it will match
+                $errors['SpouseTID'] = 'SpouseTID must only be blank or numbers with a length of 20 <br />';
+            }
+        }
+
         if(array_filter($errors)){
             //print errors
         }
@@ -43,45 +50,197 @@
             SpouseBlind (Blank unless MarriedFilingJointly, otherwise Yes/No)
             AmBlind (Yes/No)
             AmWoundedArmedForces (Yes/No)
-            ResFCountry, ResFProvince, ResFPostalCode, AmDependent, SpouseDependent, SpouseItemizesOrDualStatus need to be entered on this page. AmDependent cannot be blank (Yes/No), and if there is a Spouse, SpouseDependent (Yes/No) cannot be blank either.
+            
+            ResFCountry, ResFProvince, ResFPostalCode, AmDependent, SpouseDependent, SpouseItemizesOrDualStatus need to be entered on this page. AmDependent cannot be blank (Yes/No), and if there is a Spouse, SpouseDependent (Yes/No) cannot be blank either. //These are outside the scope of this project and will be left at default values.
+            */
+            $ResFCountry = $ResFProvince = $ResFPostalCode = $AmDependent = $SpouseDependent = $SpouseItemizesOrDualStatus = '';
 
+            /*
             -----------------------------------
 
             Calculated:
+            */
 
-            Check that no TaxReturn exists with the entered TID and TRYear. If not, then...
+            //Check that no TaxReturn exists with the entered TID and TRYear. If not, then...
 
-            FirstName -> FirstName, MiddleInitial -> MiddleInitial, LastName -> LastName, Age -> Age, Sex -> Sex, DoB -> DoB, ResSSN -> SSN, ResAddress -> ResAddress, ResAptNo -> ResAptNo, ResCity -> ResCity, ResState -> ResState, ResZIP -> ResZIP from Taxpayer matching TID == TID.
+            //Taxpayer basic info
+            $sql = "SELECT FirstName, MiddleInitial, LastName, Age, Sex, DoB, ResSSN as SSN, ResAddress, ResAptNo, ResCity, ResState, ResZIP FROM taxpayer WHERE TID = '$TID'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" Taxpayer basic info: ");
+            //print_r($row);
+            if (array_key_exists('FirstName', $row[0]) && !empty($row[0]['FirstName']))
+                $FirstName = $row[0]["FirstName"];
+            else
+                $FirstName = '';
+            if (array_key_exists('MiddleInitial', $row[0]) && !empty($row[0]['MiddleInitial']))
+                $MiddleInitial = $row[0]["MiddleInitial"];
+            else
+                $MiddleInitial = '';
+            if (array_key_exists('LastName', $row[0]) && !empty($row[0]['LastName']))
+                $LastName = $row[0]["LastName"];
+            else
+                $LastName = '';
+            if (array_key_exists('Age', $row[0]) && !empty($row[0]['Age']))
+                $Age = $row[0]["Age"];
+            else
+                $Age = '';
+            if (array_key_exists('Sex', $row[0]) && !empty($row[0]['Sex']))
+                $Sex = $row[0]["Sex"];
+            else
+                $Sex = '';
+            if (array_key_exists('DoB', $row[0]) && !empty($row[0]['DoB']))
+                $DoB = $row[0]["DoB"];
+            else
+                $DoB = '';
+            if (array_key_exists('SSN', $row[0]) && !empty($row[0]['SSN']))
+                $SSN = $row[0]["SSN"];
+            else
+                $SSN = '';
+            if (array_key_exists('ResAddress', $row[0]) && !empty($row[0]['ResAddress']))
+                $ResAddress = $row[0]["ResAddress"];
+            else
+                $ResAddress = '';
+            if (array_key_exists('ResAptNo', $row[0]) && !empty($row[0]['ResAptNo']))
+                $ResAptNo = $row[0]["ResAptNo"];
+            else
+                $ResAptNo = '';
+            if (array_key_exists('ResCity', $row[0]) && !empty($row[0]['ResCity']))
+                $ResCity = $row[0]["ResCity"];
+            else
+                $ResCity = '';
+            if (array_key_exists('ResState', $row[0]) && !empty($row[0]['ResState']))
+                $ResState = $row[0]["ResState"];
+            else 
+                $ResState = '';
+            if (array_key_exists('ResZIP', $row[0]) && !empty($row[0]['ResZIP']))
+                $ResZIP = $row[0]["ResZIP"];
+            else
+                $ResZIP = '';
+            mysqli_free_result($result);
+            $row = NULL;
+
+            //Spouse basic info
+            if ($SpouseTID != '' and $FilingStatus == "MarriedFilingJointly") {
+                $sql = "SELECT FirstName as SpouseFirst, MiddleInitial as SpouseMiddle, LastName as SpouseLast, ResSSN as SpouseSSN, DoB as SpouseDoB FROM Taxpayer WHERE TID = '$SpouseTID'";
+                $result = mysqli_query($conn, $sql);
+                $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                //print(" Spouse basic info: ");
+                //print_r($row);
+                if (array_key_exists('SpouseFirst', $row[0]) && !empty($row[0]['SpouseFirst']))
+                    $SpouseFirst = $row[0]["SpouseFirst"];
+                else
+                    $SpouseFirst = '';
+                if (array_key_exists('SpouseMiddle', $row[0]) && !empty($row[0]['SpouseMiddle']))
+                    $SpouseMiddle = $row[0]["SpouseMiddle"];
+                else
+                    $SpouseMiddle = '';
+                if (array_key_exists('SpouseLast', $row[0]) && !empty($row[0]['SpouseLast']))
+                    $SpouseLast = $row[0]["SpouseLast"];
+                else
+                    $SpouseLast = '';
+                if (array_key_exists('SpouseSSN', $row[0]) && !empty($row[0]['SpouseSSN']))
+                    $SpouseSSN = $row[0]["SpouseSSN"];
+                else
+                    $SpouseSSN = '';
+                if (array_key_exists('SpouseDoB', $row[0]) && !empty($row[0]['SpouseDoB']))
+                    $SpouseDoB = $row[0]["SpouseDoB"];
+                else
+                    $SpouseDoB = '';
+                mysqli_free_result($result);
+                $row = NULL;
+            }
+            else {
+                $SpouseFirst = $SpouseMiddle = $SpouseLast = $SpouseSSN = $SpouseDoB = '';
+            }
+
+            //BornBefore1955
+            if ($DoB < "1995-01-02") 
+                $BornBefore1955 = 'Yes';
+            elseif ($DoB > "1995-01-02")
+                $BornBefore1955 = 'No';
+            else
+                $BornBefore1955 = '';
+
+            //SpouseBornBefore1955
+            if ($SpouseTID != '') {
+                if ($SpouseDoB < "1995-01-02") 
+                    $SpouseBornBefore1955 = 'Yes';
+                else
+                    $SpouseBornBefore1955 = 'No';
+            }
+            else
+                $SpouseBornBefore1955 = '';
             
-            If SpouseTID != '' and FilingStatus == 'MarriedFilingJointly', then...
-            FirstName -> SpouseFirst, MiddleInitial -> SpouseMiddle, LastName -> LastName, ResSSN -> SSN from Taxpayer matching TID == TID.
-            Else, they all = ''.
+            //Wages
+            $sql = "SELECT SUM(WagesTipsEtc) AS Wages FROM W2 WHERE W2Year = '$TRYear' AND TID = '$TID'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" WagesTipsEtc: ");
+            //print_r($row);
+            if (array_key_exists('Wages', $row[0]) && !empty($row[0]['Wages']))
+                $Wages = $row[0]["Wages"];
+            else
+                $Wages = '0';
+            mysqli_free_result($result);
+            $row = NULL;
 
-            BornBefore1955 (January 2nd) should be calculated using Taxpayer's DoB (Yes/No).
+            //TaxExemptInterest
+            $sql = "SELECT SUM(Amount) AS TaxExemptInterest FROM Expenses WHERE TID = '$TID' AND TaxCategory = 'HomeMortgageInterests'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" TaxExemptInterest: ");
+            //print_r($row);
+            if (array_key_exists('TaxExemptInterest', $row[0]) && !empty($row[0]['TaxExemptInterest']))
+                $TaxExemptInterest = $row[0]["TaxExemptInterest"];
+            else
+                $TaxExemptInterest = '0';
+            mysqli_free_result($result);
+            $row = NULL;
 
-            if (SpouseTID == '')
-                SpouseBornBefore1955 = ''; 
-            Else calculated from Spouse's Taxpayer's DoB (Yes/No).
-
-            Wages should be the sum of all WagesTipsEtc from all W2s where TID == TID.
-
-            TaxExemptInterest should be the sum of all Amount in Expenses where TID == TID and TaxCategory == 'HomeMortgageInterests' and TaxYear = TRYear.
-
-            TaxableInterest = '0'; //should be the sum of all Amount in Expenses where TID == TID and TaxCategory == ???. //beyond the scope of this project atm
+            //Out of scope
+            $TaxableInterest = '0';
 
             $QualifiedDividends = $OrdinaryDividends = $IRADistributions = $IRATaxable = $PensionsAndAnnuities = $TaxablePensionsAndAnnuities = $SocialSecurityBenefits = $TaxableSSB = $CapitalGainLoss = '0'; 
             
             $CapitalGainLossNotRequired = '';
 
-            OtherIncome should be the sum of Amount in Earnings AND RentalEarnings where TID = TID and TRYear = TaxYear.
+            //OtherIncome
+            $sql = "SELECT SUM(Amount) AS SumEarnings FROM Earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" OtherIncome: ");
+            //print_r($row);
+            if (array_key_exists('SumEarnings', $row[0]) && !empty($row[0]['SumEarnings']))
+                $SumEarnings = $row[0]["SumEarnings"];
+            else
+                $SumEarnings = '0';
+            mysqli_free_result($result);
+            $row = NULL;
 
-            $TotalIncome = $Wages + $TaxableInterest + $OrdinaryDividends + $IRATaxable + $TaxablePensions + $TaxableSSB + $CapitalGainLoss + $OtherIncome;
+            $sql = "SELECT SUM(Amount) AS SumRental FROM RentalEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" OtherIncome2: ");
+            //print_r($row);
+            if (array_key_exists('SumRental', $row[0]) && !empty($row[0]['SumRental']))
+                $SumRental = $row[0]["SumRental"];
+            else
+                $SumRental = '0';
+            mysqli_free_result($result);
+            $row = NULL;
 
+            $OtherIncome = $SumEarnings + $SumRental;
+
+            //More calculations
+            $TotalIncome = $Wages + $TaxableInterest + $OrdinaryDividends + $IRATaxable + $TaxablePensionsAndAnnuities + $TaxableSSB + $CapitalGainLoss + $OtherIncome;
+
+            //Out of scope, set to 0.
             $AdjustmentsToIncome = '0';
 
             $AdjustedGrossIncome = $TotalIncome - $AdjustmentsToIncome;
 
-            StandardDeduction is...
+            //StandardDeduction
             if ($AmWoundedArmedForces == 'Yes')
                 $StandardDeduction = '5000';
             elseif ($AmBlind = 'Yes')
@@ -95,25 +254,163 @@
 
             $SumStdDeductAndQualifiedBusn = $StandardDeduction + $QualifiedBusinessIncomeDeduction;
 
-            OtherTaxDeductibleExpenses should be the sum of Amount in Expenses where TID = TID, TRYear = TaxYear, and TaxCategory = 'StudentLoanPlusInterest' or 'RentalRepair', PLUS the sum of Amount in EmploymentExpenses where TID = TID and TRYear = TaxYear.
-
-            TotalWithheldAlready should be the sum of TaxWithheld from Earnings, EmploymentEarnings, and RentalEarnings, where TID = TID and TRYear = TaxYear.
-
-            $TaxableIncome = $AdjustedGrossIncome - $SumStdDeductAndQualifiedBusn - $OtherTaxDeductibleExpenses
-
-            $ATITaxes uses the graduated scale in the syllabus.
-
-            $TotalTaxOwed = $ATITaxes - $TotalWithheldAlready
-
-
-
-            Then INSERT all of these into TaxReturn.
-
-            Then dump the results onto the page.
+            //OtherTaxDeductibleExpenses
+            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleExpenses FROM Expenses WHERE TID = '$TID' AND TaxYear = '$TRYear' AND (TaxCategory = 'StudentLoanPlusInterest' OR TaxCategory = 'RentalRepair')";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" OtherTaxDeductibleExpenses: ");
+            //print_r($row);
+            if (array_key_exists('SumTaxDeductibleExpenses', $row[0]) && !empty($row[0]['SumTaxDeductibleExpenses']))
+                $SumTaxDeductibleExpenses = $row[0]["SumTaxDeductibleExpenses"];
+            else
+                $SumTaxDeductibleExpenses = '0';
+            mysqli_free_result($result);
+            $row = NULL;
             
-            TODO: Page where you can query and display already-created TaxReturn entries?
+            $sql = "SELECT SUM(Amount) AS SumTaxDeductibleEmplExpenses FROM EmploymentExpenses WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" SumTaxDeductibleEmplExpenses: ");
+            //print_r($row);
+            if (array_key_exists('SumTaxDeductibleEmplExpenses', $row[0]) && !empty($row[0]['SumTaxDeductibleEmplExpenses']))
+                $SumTaxDeductibleEmplExpenses = $row[0]["SumTaxDeductibleEmplExpenses"];
+            else
+                $SumTaxDeductibleEmplExpenses = '0';
+            mysqli_free_result($result);
+            $row = NULL;
+
+            $OtherTaxDeductibleExpenses = $SumTaxDeductibleExpenses + $SumTaxDeductibleEmplExpenses;
+
+            //TotalWithheldAlready
+            $sql = "SELECT SUM(TaxWithheld) AS WithheldEarnings FROM Earnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" WithheldEarnings: ");
+            //print_r($row);
+            if (array_key_exists('WithheldEarnings', $row[0]) && !empty($row[0]['WithheldEarnings']))
+                $WithheldEarnings = $row[0]["WithheldEarnings"];
+            else
+                $WithheldEarnings = '0';
+            mysqli_free_result($result);
+            $row = NULL;
+
+            $sql = "SELECT SUM(TaxWithheld) AS WithheldEmpEarnings FROM EmploymentEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" WithheldEmpEarnings: ");
+            //print_r($row);
+            if (array_key_exists('WithheldEmpEarnings', $row[0]) && !empty($row[0]['WithheldEmpEarnings']))
+                $WithheldEmpEarnings = $row[0]["WithheldEmpEarnings"];
+            else
+                $WithheldEmpEarnings = '0';
+            mysqli_free_result($result);
+            $row = NULL;
+
+            $sql = "SELECT SUM(TaxWithheld) AS WithheldRentEarnings FROM RentalEarnings WHERE TID = '$TID' AND TaxYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            //print(" WithheldRentEarnings: ");
+            //print_r($row);
+            if (array_key_exists('WithheldRentEarnings', $row[0]) && !empty($row[0]['WithheldRentEarnings']))
+                $WithheldRentEarnings = $row[0]["WithheldRentEarnings"];
+            else
+                $WithheldRentEarnings = '0';
+            mysqli_free_result($result);
+            $row = NULL;
+
+            $TotalWithheldAlready = $WithheldEarnings + $WithheldEmpEarnings + $WithheldRentEarnings;
+
+            //TaxableIncome
+            $TaxableIncome = $AdjustedGrossIncome - $SumStdDeductAndQualifiedBusn - $OtherTaxDeductibleExpenses;
+
+            //$ATITaxes
+            //print($TaxableIncome);
+            $tempTaxableIncome = $TaxableIncome;
+            //echo " "; 
+            //echo $tempTaxableIncome;
+            $ATITaxes = 0;
+            while($tempTaxableIncome != 0) {
+                if ($tempTaxableIncome > 35000) {
+                    $temp = $tempTaxableIncome - 35000;
+                    $ATITaxes += ($temp * 0.3);
+                    $tempTaxableIncome = 35000;
+                }
+                elseif (($tempTaxableIncome > 18000)) {
+                    $temp = $tempTaxableIncome - 18000;
+                    $ATITaxes += ($temp * 0.25);
+                    $tempTaxableIncome = 18000;
+                }
+                elseif (($tempTaxableIncome > 11000)) {
+                    $temp = $tempTaxableIncome - 11000;
+                    //print " temp over 11000: ";
+                    //echo $temp;
+                    $ATITaxes += ($temp * 0.2);
+                    //print " ATITaxes: ";
+                    //echo $ATITaxes;
+                    $tempTaxableIncome = 11000;
+                }
+                elseif (($tempTaxableIncome > 5000)) {
+                    $temp = $tempTaxableIncome - 5000;
+                    //print " temp over 5000: ";
+                    //echo $temp;
+                    $ATITaxes += ($temp * 0.15);
+                    //print " ATITaxes: ";
+                    //echo $ATITaxes;
+                    $tempTaxableIncome = 5000;
+                }
+                elseif ($tempTaxableIncome < 0) {
+                    $ATITaxes = 0;
+                    $tempTaxableIncome = 0;
+                }
+                else /*($tempTaxableIncome <= 5000)*/ {
+                    $temp = $tempTaxableIncome;
+                    //print " temp under 5001: ";
+                    //echo $temp;
+                    $ATITaxes += ($temp * 0.1);
+                    //print " ATITaxes: ";
+                    //echo $ATITaxes;
+                    $tempTaxableIncome = 0;
+                }
+            }
+            /*
+            echo " ATITaxes:";
+            echo $ATITaxes;
+            ceil($ATITaxes); //round up
+            echo " ATITaxes:";
+            echo $ATITaxes;
             */
 
+            //TotalTaxOwed
+            $TotalTaxOwed = $ATITaxes - $TotalWithheldAlready;
+
+            /*
+            echo " First Name: ";
+            echo $FirstName;
+            echo " Wages: ";
+            echo $Wages;
+            echo " WithheldEarnings: ";
+            echo $WithheldEarnings;
+            echo " TaxExemptInterest: ";
+            echo $TaxExemptInterest;
+            echo " TotalWithheldAlready: ";
+            echo $TotalWithheldAlready;
+            */
+
+            //Then INSERT all of these into TaxReturn.
+            $sql = "INSERT INTO TaxReturn VALUES ('$TID', '$TRYear', '$FilingStatus', '$FirstName', '$MiddleInitial', '$LastName', '$Age', '$Sex', '$DoB', '$SSN', '$SpouseTID', '$SpouseFirst', '$SpouseMiddle', '$SpouseLast', '$SpouseSSN', '$ResAddress', '$ResAptNo', '$ResCity', '$ResState', '$ResZIP', '$ResFCountry', '$ResFProvince', '$ResFPostalCode', '$AmDependent', '$SpouseDependent', '$SpouseItemizesOrDualStatus', '$BornBefore1955', '$AmBlind', '$SpouseBornBefore1955', '$SpouseBlind', '$Wages', '$TaxExemptInterest', '$TaxableInterest', '$QualifiedDividends', '$OrdinaryDividends', '$IRADistributions', '$IRATaxable', '$PensionsAndAnnuities', '$TaxablePensionsAndAnnuities', '$SocialSecurityBenefits', '$TaxableSSB', '$CapitalGainLoss', '$CapitalGainLossNotRequired', '$OtherIncome', '$TotalIncome', '$AdjustmentsToIncome', '$AdjustedGrossIncome', '$StandardDeduction', '$QualifiedBusinessIncomeDeduction', '$SumStdDeductAndQualifiedBusn', '$OtherTaxDeductibleExpenses', '$TotalWithheldAlready', '$TaxableIncome', '$ATITaxes', '$TotalTaxOwed')";
+            mysqli_query($conn, $sql);
+
+            //Dump the results onto the page.
+            $sql = "SELECT * FROM TaxReturn WHERE TID = '$TID' AND TRYear = '$TRYear'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            print_r($row);
+            //var_dump($result);
+            mysqli_free_result($result);
+            $row = NULL;
+            
+            //TODO: Page where you can query and display already-created TaxReturn entries?
+            mysqli_close($conn);
         }
     }
     
@@ -129,10 +426,33 @@
         <form class="white" action="createTaxReturn.php" method="POST">
             <label>Personal TID</label>
             <input type="text" name="TID" value="<?php echo htmlspecialchars($TID)?>">
+            <div class="red-text"><?php echo $errors['TID']; ?></div>
 
             <label>Tax Return Year</label>
             <input type="text" name="TRYear" value="<?php echo htmlspecialchars($TRYear)?>">
             <div class="red-text"><?php echo $errors['TRYear']; ?></div>
+
+            <label>Filing Status (Single, MarriedFilingJointly, MarriedFilingSeparately)</label>
+            <input type="text" name="FilingStatus" value="<?php echo htmlspecialchars($FilingStatus)?>">
+            <div class="red-text"><?php echo $errors['FilingStatus']; ?></div>
+
+            <label>Spouse TID (Leave blank if Single or MarriedFilingSeparately)</label>
+            <input type="text" name="SpouseTID" value="<?php echo htmlspecialchars($SpouseTID)?>">
+            <div class="red-text"><?php echo $errors['SpouseTID']; ?></div>
+
+            <label>Is your spouse legally blind? (Yes/No)</label>
+            <input type="text" name="SpouseBlind" value="<?php echo htmlspecialchars($SpouseBlind)?>">
+            <div class="red-text"><?php echo $errors['SpouseBlind']; ?></div>
+
+            <label>Are you legally blind? (Yes/No)</label>
+            <input type="text" name="AmBlind" value="<?php echo htmlspecialchars($AmBlind)?>">
+            <div class="red-text"><?php echo $errors['AmBlind']; ?></div>
+
+            <label>Were you wounded while serving in the United States Armed Forces? (Yes/No)</label>
+            <input type="text" name="AmWoundedArmedForces" value="<?php echo htmlspecialchars($AmWoundedArmedForces)?>">
+            <div class="red-text"><?php echo $errors['AmWoundedArmedForces']; ?></div>
+
+            
 
             <div class="center">
                 <input type="submit" name="submit" value ="submit" 
