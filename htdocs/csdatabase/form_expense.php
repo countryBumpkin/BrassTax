@@ -125,7 +125,7 @@
             <input type="text" name="category" value="<?php echo htmlspecialchars($category)?>">
             <div class="red-text"><?php echo $errors['category']; ?></div>
             
-            <label>Amounts (Each number must end with ; )</label>
+            <label>Amounts </label>
             <input type="text" name="amount" value="<?php echo htmlspecialchars($amount)?>">
             <div class="red-text"><?php echo $errors['amount']; ?></div>
             
