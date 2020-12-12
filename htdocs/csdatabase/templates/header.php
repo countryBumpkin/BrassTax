@@ -43,6 +43,9 @@
         <ul id="nav-mobile" class="right hide-on-small-and-down">
             <li><a href="createTaxReturn.php" class="btn buttonColor z-depth-0">Create Tax Return</a></li>
         </ul>
+        <ul id="nav-mobile" class="right hide-on-small-and-down">
+            <li><a href="printPDF.php" class="btn buttonColor z-depth-0">Print PDF</a></li>
+        </ul>
     </div>
     <div class="nav-content headerbackground2">
       <ul class="tabs tabs-transparent">

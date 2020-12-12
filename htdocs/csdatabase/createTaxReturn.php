@@ -489,7 +489,7 @@
             if(!$result){
                 echo "Error@484: " . mysqli_error($conn);
             }else{
-                echo mysqli_num_rows($result);
+                //echo mysqli_num_rows($result);
             }
             //fill array with query results
             $completedTR = array();
@@ -505,6 +505,9 @@
             //TODO: Page where you can query and display already-created TaxReturn entries?
             mysqli_close($conn);
         }
+    }
+    if(isset($_POST['print_to_pdf'])) {
+        echo "Hello World!";
     }
     
 ?>
