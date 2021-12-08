@@ -1,5 +1,5 @@
 # BrassTax
-Repository for CS360 semester project. Contains code for the project and gives version control across all our systems. Meant to increase stability so that if somebody has a system failure it doesn't wreck all other project members.
+Website for viewing tax information, performing tax calculations, and querying past tax filings. Used for CS360 Introduction to Database Design semester project. Contains code for the project and gives version control across all our systems. Meant to increase stability so that if somebody has a system failure it doesn't wreck all other project members.
 
 ## Guidelines 
 1. Main branch should contain ***deployable code only***. Fork for personal work and adding features.
